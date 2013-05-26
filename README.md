@@ -27,3 +27,13 @@ After cloning the code, just type
     go run *.go
 
 in the orchestrate directory. Then you can access http://localhost:9000/ to try it out.
+
+
+Contribute
+----------
+
+Please let me know:
+
+* how to improve the code
+* how to properly package
+* how to get rid of the duplicate JSON code in WSConnection.ProxyRedisSubscribe()
