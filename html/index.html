@@ -1,0 +1,109 @@
+<html>
+<head>
+    <title>Redis PubSub to WebSocket</title>
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
+    <script type="text/javascript">
+        $(function() {
+        var connection;
+        var log = $("#log");
+        var subscribe_channel = $("#subscribe_channel");
+        var unsubscribe_channel = $("#unsubscribe_channel");
+        var channel = $("#channel");
+        var data = $("#data");
+
+        function appendLog(msg) {
+            var d = log[0]
+            var doScroll = d.scrollTop == d.scrollHeight - d.clientHeight;
+            msg.appendTo(log)
+            if (doScroll) {
+                d.scrollTop = d.scrollHeight - d.clientHeight;
+            }
+        }
+
+        $("#subscribe").submit(function() {
+            if (!connection || !subscribe_channel.val()) {
+                return false;
+            }
+            var message = {
+                action: "SUBSCRIBE",
+                channel: subscribe_channel.val(),
+                data: ""
+            }
+            connection.send(JSON.stringify(message));
+            subscribe_channel.val("");
+            return false;
+        });
+
+        $("#unsubscribe").submit(function() {
+            if (!connection || !unsubscribe_channel.val()) {
+                return false;
+            }
+            var message = {
+                action: "UNSUBSCRIBE",
+                channel: unsubscribe_channel.val(),
+                data: ""
+            }
+            connection.send(JSON.stringify(message));
+            unsubscribe_channel.val("");
+            return false;
+        });
+
+        $("#publish").submit(function() {
+            if (!connection || !channel.val() || !data.val()) {
+                return false;
+            }
+            var message = {
+                action: "PUBLISH",
+                channel: channel.val(),
+                data: data.val()
+            }
+            connection.send(JSON.stringify(message));
+            data.val("");
+            return false;
+        });
+
+        if (window["WebSocket"]) {
+            connection = new WebSocket("ws://{{$}}/ws");
+            connection.onclose = function(evt) {
+                appendLog($("<div><b>Connection closed.</b></div>"))
+            }
+            connection.onmessage = function(evt) {
+                appendLog($("<div/>").text(evt.data))
+            }
+        } else {
+            appendLog($("<div><b>Your browser does not support WebSockets.</b></div>"))
+        }
+        });
+    </script>
+    <style type="text/css">
+        body {
+            background: gray;
+        }
+
+        #log {
+            background: white;
+            height: 200px;
+            width: 450px;
+            overflow: auto;
+        }
+    </style>
+</head>
+
+<body>
+    <form id="subscribe">
+        <input type="text" id="subscribe_channel" value="channel" size="10"/>
+        <input type="submit" value="Subscribe" />
+    </form>
+    <form id="unsubscribe">
+        <input type="text" id="unsubscribe_channel" value="channel" size="10"/>
+        <input type="submit" value="Unsubscribe" />
+    </form>
+    <form id="publish">
+        <input type="text" id="channel" value="channel" size="10"/>
+        <input type="text" id="data" value="message" size="20"/>
+        <input type="submit" value="Publish" />
+    </form>
+
+    <div id="log"></div>
+</body>
+</html>
