@@ -3,8 +3,8 @@ package main
 import "fmt"
 
 func main() {
-	go runWSServer()
-	go serveWeb()
+    go runWSServer()
+    go serveWeb()
 
-	fmt.Scanln(new(string))
+    fmt.Scanln(new(string))
 }
